@@ -61,7 +61,7 @@
 # a = Post.objects.order_by('-raiting_article')[:1]
 # for i in a:
 # ...     i.date_create_post
-# ...     i.author.username
+# ...     i.author.author.username
 # ...     i.raiting_article
 # ...     i.title
 # ...     i.preview()
