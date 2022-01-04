@@ -16,7 +16,7 @@ News
     {% for post in posts %}
         <h4>{{ post.title|Censor }}</h4>
         <h6>{{ post.date_create_post }}</h6>
-        {{ post.text_article|truncatechars:50,|Censor }}
+        {{ post.text_article|truncatechars:50|Censor  }}
         <hr>
     {% endfor %}
 {% else %}
