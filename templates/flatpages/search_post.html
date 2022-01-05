@@ -1,0 +1,29 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+<!-- Название у нас будет proudcts -->
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+
+    <form method="GET">
+    <hr>
+        <input type="date">
+    {{ filter.form }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
+    <input type="submit" value="Найти">
+    </form>
+    {% for post in filter.qs %}
+        <h1>{{ post.title|Censor }}</h1>
+        <h6>{{ post.text_article|Censor }}</h6>
+        <hr>
+        <h6>{{ post.date_create_post| date:'d M Y' }} , {{ post.date_create_post| time }}</h6>
+    {% endfor %}
+
+
+
+
+{% endblock content %}

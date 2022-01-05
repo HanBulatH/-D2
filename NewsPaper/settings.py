@@ -48,8 +48,7 @@ INSTALLED_APPS = [
     'fpages',
     'static',
     'templates',
-
-
+    'django_filters',
 
 ]
 

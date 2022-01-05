@@ -1,0 +1,11 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %} Product list {% endblock title %}
+
+{% block content %}
+<h2>Вы действительно хотите новость/стать?</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="подтвердить"></form>
+{% endblock content %}

@@ -4,7 +4,7 @@ register = template.Library()  # если мы не зарегистрируем
 
 @register.filter(name='Censor')
 def Censor (value):
-    cencor_word = ['Россия', 'федерализма', 'МИД']
+    cencor_word = ['Россия', 'федерализма', 'МИД', 'Эфиопии']
     word_list = (str(value)).split()
 
     for i in cencor_word:

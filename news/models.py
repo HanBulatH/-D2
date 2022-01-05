@@ -20,10 +20,24 @@ class Author (models.Model):
         self.raiting_Author = p_r * 3 + c_r
         self.save()
 
+    def __str__(self):
+        return f'{self.author}'
+
+    class Meta:
+        verbose_name = 'Автор'
+        verbose_name_plural = 'Авторы'
+        # ordering = ['-price']
+
 
 class Category (models.Model):
     category_name = models.CharField(max_length=64, unique=True)
 
+    def __str__(self):
+        return f'{self.category_name}'
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
 class Post (models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
@@ -52,6 +66,15 @@ class Post (models.Model):
     def preview(self):
         return "{} ...".format(self.text_article[0:123])
 
+    def __str__(self):
+        return f'{self.title}'
+
+    class Meta:
+        verbose_name = 'Новость'
+        verbose_name_plural = 'Новости'
+
+    def get_absolute_url(self):  # добавим абсолютный путь, чтобы после создания нас перебрасывало на страницу с товаром
+        return f'/posts/{self.id}'
 
 class PostCategory (models.Model):
     post_Through = models.ForeignKey(Post, on_delete=models.CASCADE)
