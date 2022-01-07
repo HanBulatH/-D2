@@ -81,7 +81,7 @@ class PostDelete( PermissionRequiredMixin, DeleteView):
 class PostEdit(PermissionRequiredMixin, UpdateView):
     permission_required = ('news.change_post')
     model = Post
-    template_name = 'flatpages/post_add.html'
+    template_name = 'flatpages/post_edit.html'
     form_class = PostForm
 
     # метод get_object мы используем вместо queryset, чтобы получить информацию об объекте, который мы собираемся редактировать

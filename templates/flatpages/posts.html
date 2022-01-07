@@ -15,11 +15,13 @@ News
 {% if posts %}
     {% for post in posts %}
         <a href="{% url 'post' post.id %}">{{ post.title|title }}</a> <!-- При нажатии на имя товара в таблице нас теперь будет перекидывать на страницу с самого товара -->
-        <a href="{% url 'post_add' post.id %}"><u>Редактировать</u></a> <!-- добавим ссылку на редактирование товара-->
-        <a href="{% url 'post_delet' post.id %}"><u> Удалить </u></a> <!-- добавим ссылку на удаление товара-->
+
 <!--        <h4>{{ post.title|Censor }}</h4>-->
         <h6>{{ post.date_create_post }}</h6>
-        {{ post.text_article|truncatechars:50|Censor  }}
+        <h6>{{ post.post_category }}</h6>
+        <h6>{{ post.text_article|truncatechars:100|Censor  }}</h6>
+        <a href="{% url 'post_edit' post.id %}"><u>Редактировать</u></a> <!-- добавим ссылку на редактирование товара-->
+        <a href="{% url 'post_delet' post.id %}"><u> Удалить </u></a> <!-- добавим ссылку на удаление товара-->
         <hr>
 
     {% endfor %}
