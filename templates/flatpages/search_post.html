@@ -12,8 +12,8 @@ News
 
     <form method="GET">
     <hr>
-        <input type="date">
-    {{ filter.form }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
+<!--        <input type="date">-->
+    {{ filter.form.as_p }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
     <input type="submit" value="Найти">
     </form>
     {% for post in filter.qs %}

@@ -1,7 +1,11 @@
-from django.views.generic import ListView, DetailView, DeleteView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, DeleteView, CreateView, UpdateView, TemplateView
 from .models import Post, Category, Author
 from .filters import PostFilter
 from .forms import PostForm  # импортируем нашу форму
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
+
+
 
 
 # Create your views here.
@@ -26,17 +30,17 @@ class PostsSeach(ListView):
     template_name = 'flatpages/search_post.html'
     # context_object_name = 'posts'
 
-    def get_context_data(self,
-                         **kwargs):  # забираем отфильтрованные объекты переопределяя метод get_context_data у наследуемого класса (привет, полиморфизм, мы скучали!!!)
+    def get_context_data(self, **kwargs):  # забираем отфильтрованные объекты переопределяя метод get_context_data у наследуемого класса (привет, полиморфизм, мы скучали!!!)
         context = super().get_context_data(**kwargs)
-        context['filter'] = PostFilter(self.request.GET,
-                                          queryset=self.get_queryset())  # вписываем наш фильтр в контекст
+        context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())  # вписываем наш фильтр в контекст
         # context['categories'] = Category.objects.all()
         # context['form'] = PostForm()
         return context
 
 # дженерик для создания
-class PostCreate(CreateView):
+class PostCreate( PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post')
+    model = Post
     template_name = 'flatpages/post_add.html'
     form_class = PostForm
 
@@ -66,13 +70,17 @@ class PostCreate(CreateView):
 
 
 # дженерик для удаления
-class PostDelete(DeleteView):
+class PostDelete( PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post')
+    model = Post
     template_name = 'flatpages/post_delet.html'
     queryset = Post.objects.all()
     success_url = '/posts/'
 
 # дженерик для редактирования объекта
-class PostEdit(UpdateView):
+class PostEdit(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post')
+    model = Post
     template_name = 'flatpages/post_add.html'
     form_class = PostForm
 
