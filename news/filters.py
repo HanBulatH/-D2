@@ -13,6 +13,7 @@ class PostFilter(FilterSet):
 
             'date_create_post': ['gt'],
             'title': ['icontains'],
-            'author': ['exact']
+            'author': ['exact'],
+            'post_category': ['exact'],
 
         }

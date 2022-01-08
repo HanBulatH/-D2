@@ -1,0 +1,29 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+<!-- Название у нас будет proudcts -->
+{% block title %}
+Categories
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим сам товар, ID которого было передано в адрес -->
+{% block content %}
+<h1>Список категорий</h1>
+{% if categories %}
+    {% for category in categories %}
+        <h6><a href="{% url 'post_category' %}">{{ category.category_name}}</a></h6>
+<!--        <h6>{{ category.category_name }} </h6>-->
+        <input type="submit" value="Подписаться">
+        <hr>
+    {% endfor %}
+{% else %}
+    <h2>Нет категорий!</h2>
+{% endif %}
+
+
+
+
+
+{% endblock content %}

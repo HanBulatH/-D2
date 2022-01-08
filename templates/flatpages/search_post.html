@@ -15,12 +15,18 @@ News
 <!--        <input type="date">-->
     {{ filter.form.as_p }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
     <input type="submit" value="Найти">
+    <hr>
     </form>
     {% for post in filter.qs %}
+
         <h1>{{ post.title|Censor }}</h1>
+        {% for cat in post.post_category.all %}
+            <h6>{{  cat.category_name }}</h6>
+        {% endfor %}
         <h6>{{ post.text_article|Censor }}</h6>
-        <hr>
+
         <h6>{{ post.date_create_post| date:'d M Y' }} , {{ post.date_create_post| time }}</h6>
+        <hr>
     {% endfor %}
 
 

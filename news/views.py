@@ -11,6 +11,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 # Create your views here.
 
 
+
+
 class PostsList (ListView):
     model = Post  # указываем модель, объекты которой мы будем выводить
     template_name = 'flatpages/posts.html'  # указываем имя шаблона, в котором будет лежать HTML, в котором будут все инструкции о том, как именно пользователю должны вывестись наши объекты
@@ -88,3 +90,14 @@ class PostEdit(PermissionRequiredMixin, UpdateView):
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
         return Post.objects.get(pk=id)
+
+class CategoryList (ListView):
+    model = Category
+    template_name = 'flatpages/category_list.html'
+    context_object_name = 'categories'
+    # queryset = Post.objects.order_by('-id')
+
+class CategoryDetail(DetailView):
+    model = Category  # модель всё та же, но мы хотим получать детали конкретно отдельного товара
+    template_name = 'flatpages/post_category.html'  # название шаблона будет product.html
+    context_object_name = 'post_category'  # название объекта. в нём будет

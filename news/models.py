@@ -4,9 +4,16 @@ from django.db.models import Sum
 
 # Create your models here.
 
+
+
+
+
+
+
 class Author (models.Model):
     author = models.OneToOneField(User, on_delete=models.CASCADE)
     raiting_Author = models.SmallIntegerField(default=0)
+
 
     def update_rating(self):
         post_raiting = self.post_set.aggregate(post_raiting_=Sum('raiting_article'))
@@ -31,6 +38,7 @@ class Author (models.Model):
 
 class Category (models.Model):
     category_name = models.CharField(max_length=64, unique=True)
+    # subscribers = models.ForeignKey(Author, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.category_name}'
@@ -38,6 +46,7 @@ class Category (models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+
 
 class Post (models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
