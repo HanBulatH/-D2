@@ -14,8 +14,15 @@ Categories
 {% if categories %}
     {% for category in categories %}
         <h6><a href="{% url 'post_category' %}">{{ category.category_name}}</a></h6>
-<!--        <h6>{{ category.category_name }} </h6>-->
-        <input type="submit" value="Подписаться">
+
+<!--GET запрос, который передает в наше представление значение категории, переменная post.category.id, -->
+<!--которая в дальнейшем необходима для добавления подписчиков-->
+
+            <button><a href="{% url 'subscribed' category.id %}">Подписаться</a></button>
+
+
+
+
         <hr>
     {% endfor %}
 {% else %}

@@ -24,8 +24,11 @@ urlpatterns = [
     path('', include('protect.urls')),
     path('sign/', include('sign.urls')),
     path('accounts/', include('allauth.urls')),
-    path('category/', include('news.urls')),
     path('posts/', include('news.urls')),
+
+    # path('appointments/', include(('appointment.urls', 'appointments'), namespace='appointments')),
+
+
 
 
 

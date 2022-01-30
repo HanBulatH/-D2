@@ -1,12 +1,14 @@
 from django.views.generic import ListView, DetailView, DeleteView, CreateView, UpdateView, TemplateView
-from .models import Post, Category, Author
+from .models import Post, Category, Author, PostCategory, User
 from .filters import PostFilter
 from .forms import PostForm  # импортируем нашу форму
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-
-
-
-
+from django.core.mail import mail_admins
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 # Create your views here.
 
@@ -45,6 +47,48 @@ class PostCreate( PermissionRequiredMixin, CreateView):
     model = Post
     template_name = 'flatpages/post_add.html'
     form_class = PostForm
+
+    def post(self, request, *args, **kwargs):
+        form = PostForm(request.POST)
+        category_pk = request.POST.get('post_category')
+        sub_text = request.POST.get('text_article')
+        sub_title = request.POST.get('title')
+        category = Category.objects.get(pk=category_pk)
+        subscribers = category.subscribers.all()
+        # получаем адрес хоста и порта (в нашем случае 127.0.0.1:8000), чтоб в дальнейшем указать его в ссылке
+        # в письме, чтоб пользователь мог с письма переходить на наш сайт, на конкретную новость
+        host = request.META.get('HTTP_HOST')
+
+        # валидатор - чтоб данные в форме были корректно введены, без вредоносного кода от хакеров и прочего
+        if form.is_valid():
+            news = form.save(commit=False)
+            news.save()
+            print('Статья:', news)
+
+        for subscriber in subscribers:
+            print('Адреса рассылки:', subscriber.email)
+
+            # (6)
+            html_content = render_to_string(
+                'mail_creat.html', {'user': subscriber, 'text': sub_text[:50], 'post': news, 'host': host})
+
+            # (7)
+            msg = EmailMultiAlternatives(
+                # Заголовок письма, тема письма
+                subject=f'Здравствуй, {subscriber.username}. Новая статья в вашем разделе!',
+                # Наполнение письма
+                body=f'{sub_title}, {sub_text[:50]}',
+                # От кого письмо (должно совпадать с реальным адресом почты)
+                from_email='bulmiftahoff@yandex.ru',
+                # Кому отправлять, конкретные адреса рассылки, берем из переменной, либо можно явно прописать
+                to=[subscriber.email],
+            )
+
+            msg.attach_alternative(html_content, "text/html")
+
+            msg.send()
+
+        return redirect('/news/')
 
 
 # class Post_Add(CreateView):
@@ -96,8 +140,61 @@ class CategoryList (ListView):
     template_name = 'flatpages/category_list.html'
     context_object_name = 'categories'
     # queryset = Post.objects.order_by('-id')
+    # для отображения кнопок подписки (если не подписан: кнопка подписки - видима, и наоборот)
 
-class CategoryDetail(DetailView):
-    model = Category  # модель всё та же, но мы хотим получать детали конкретно отдельного товара
-    template_name = 'flatpages/post_category.html'  # название шаблона будет product.html
-    context_object_name = 'post_category'  # название объекта. в нём будет
+
+
+# class CategoryDetail(DetailView):
+#     model = Category  # модель всё та же, но мы хотим получать детали конкретно отдельного товара
+#     template_name = 'flatpages/post_category.html'  # название шаблона будет product.html
+#     context_object_name = 'post_category'  # название объекта. в нём будет
+
+@login_required
+def subscribe_me(request, news_category_id):
+    user = request.user
+    my_category = Category.objects.get(id=news_category_id)
+    sub_user = User.objects.get(id=user.pk)
+    if my_category.subscribers.filter(id=user.pk):
+        my_category.subscribers.remove(sub_user)
+        return redirect('/news/')
+    else:
+        my_category.subscribers.add(sub_user)
+        return redirect('/news/')
+
+# @login_required
+# def add_subscribe(request, **kwargs):
+#     pk = request.GET.get('pk', )
+#     print('Пользователь', request.user, 'добавлен в подписчики категории:', Category.objects.get(pk=pk))
+#     Category.objects.get(pk=pk).subscribers.add(request.user)
+#     return redirect('/news/')
+#
+#
+# # функция отписки от группы
+# @login_required
+# def del_subscribe(request, **kwargs):
+#     pk = request.GET.get('pk', )
+#     print('Пользователь', request.user, 'удален из подписчиков категории:', Category.objects.get(pk=pk))
+#     Category.objects.get(pk=pk).subscribers.remove(request.user)
+    return redirect('/news/')
+
+
+# def add_del_subscribe(request, **kwargs):
+#     pk = request.GET.get('pk',)
+#     user = request.user
+#     my_category = Category.objects.get(pk=pk)
+#     sub_user = User.objects.get(pk=user.pk)
+#     print('Пользователь', user, 'додписался на категории:', my_category)
+#
+#     if my_category.subscribers.filter(pk=user.pk):
+#         my_category.subscribers.remove(sub_user)
+#         return redirect('/news/')
+#     else:
+#         my_category.subscribers.add(sub_user)
+#         return redirect('/news/')
+    # # category_object = PostCategory.objects.get(postThrough=pk)
+    # # category_object_name = category_object.categoryThrough
+    # print('Пользователь', user, 'добавлен в подписчики категории:', category_object_name.objects.get(pk=pk))
+    # # category_object_name.objects.get(pk=pk).subscribers.add(user)
+    # return redirect('/categories/')
+
+# Первый способ отправки сообщений подписчику (второй через сигналы сделан)
