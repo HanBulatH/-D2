@@ -48,6 +48,8 @@ class PostCreate( PermissionRequiredMixin, CreateView):
     template_name = 'flatpages/post_add.html'
     form_class = PostForm
 
+
+
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST)
         category_pk = request.POST.get('post_category')
