@@ -38,18 +38,18 @@ def news_sender():
 
         # Второй цикл - из первого цикла получием рк категории, и подставляем его в запрос, в первый фильтр, во второй
         # фильтр подставляем значение предыдущей недели, то есть показать статьи с датой создания предыдущей недели
-        for news in Post.objects.filter(category_id=category.id,
+        for news in Post.objects.filter(post_category=category.id,
                                         date_create_post__week=week_number_last).values('pk',
                                                                                     'title',
                                                                                     'date_create_post',
-                                                                                    'category_id__name'):
+                                                                                    'post_category__category_name'):
             # преобразуем дату в человеческий вид - убираем секунды и прочую хрень
             date_format = news.get("date_create_post").strftime("%m/%d/%Y")
 
             # из данных запроса выдираем нужные нам поля (dateCreation - для проверки выводится), и из значений данных
             # полей формируем заголовок и реальную ссылку на переход на статью на наш сайт
             new = (f' http://127.0.0.1:8000/news/{news.get("pk")}, {news.get("title")}, '
-                   f'Категория: {news.get("category_id__name")}, Дата создания: {date_format}')
+                   f'Категория: {news.get("post_category__category_name")}, Дата создания: {date_format}')
 
             # каждую строчку помещаем в список новостей
             news_from_each_category.append(new)
@@ -65,7 +65,7 @@ def news_sender():
             html_content = render_to_string(
                 'mail_sender.html', {'user': subscriber,
                                      'text': news_from_each_category,
-                                     'category_name': category.name,
+                                     # 'category_name': category_name,
                                      'week_number_last': week_number_last})
 
             msg = EmailMultiAlternatives(
@@ -99,7 +99,7 @@ class Command(BaseCommand):
 
             # для проверки отправки временно задано время срабатывания каждые 10 секунд
             trigger=CronTrigger(second="*/59"),
-
+            # trigger=CronTrigger(week="*/1"),
             # временно отключеный код
             # отправляем письма подписчикам в понедельник в 8 утра
             # trigger=CronTrigger(day_of_week="mon", hour="08", minute="00"),

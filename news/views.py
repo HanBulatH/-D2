@@ -177,7 +177,7 @@ def subscribe_me(request, news_category_id):
 #     pk = request.GET.get('pk', )
 #     print('Пользователь', request.user, 'удален из подписчиков категории:', Category.objects.get(pk=pk))
 #     Category.objects.get(pk=pk).subscribers.remove(request.user)
-    return redirect('/news/')
+#     return redirect('/news/')
 
 
 # def add_del_subscribe(request, **kwargs):
