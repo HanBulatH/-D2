@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
-
+from news.tasks import send_mail_for_every_week_after_sub
 from datetime import datetime
 
 from news.models import Category, Post, PostCategory
@@ -68,15 +68,21 @@ def news_sender():
                                      # 'category_name': category_name,
                                      'week_number_last': week_number_last})
 
-            msg = EmailMultiAlternatives(
-                subject=f'Здравствуй, {subscriber.username}, новые статьи за прошлую неделю в вашем разделе!',
-                from_email='bulmiftahoff@yandex.ru',
-                to=[subscriber.email]
-            )
+            sub_username = subscriber.username
+            sub_useremail = subscriber.email
 
-            msg.attach_alternative(html_content, 'text/html')
+            # отправляем задачу в таску для еженедельной рассылки
+            send_mail_for_every_week_after_sub(sub_username, sub_useremail, html_content)
 
-            msg.send()
+            # msg = EmailMultiAlternatives(
+            #     subject=f'Здравствуй, {subscriber.username}, новые статьи за прошлую неделю в вашем разделе!',
+            #     from_email='bulmiftahoff@yandex.ru',
+            #     to=[subscriber.email]
+            # )
+            #
+            # msg.attach_alternative(html_content, 'text/html')
+            #
+            # msg.send()
 
 
 #

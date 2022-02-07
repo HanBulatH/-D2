@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
+from .tasks import send_mail_after_creat
 # Create your views here.
 
 
@@ -49,7 +49,6 @@ class PostCreate( PermissionRequiredMixin, CreateView):
     form_class = PostForm
 
 
-
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST)
         category_pk = request.POST.get('post_category')
@@ -74,21 +73,26 @@ class PostCreate( PermissionRequiredMixin, CreateView):
             html_content = render_to_string(
                 'mail_creat.html', {'user': subscriber, 'text': sub_text[:50], 'post': news, 'host': host})
 
-            # (7)
-            msg = EmailMultiAlternatives(
-                # Заголовок письма, тема письма
-                subject=f'Здравствуй, {subscriber.username}. Новая статья в вашем разделе!',
-                # Наполнение письма
-                body=f'{sub_title}, {sub_text[:50]}',
-                # От кого письмо (должно совпадать с реальным адресом почты)
-                from_email='bulmiftahoff@yandex.ru',
-                # Кому отправлять, конкретные адреса рассылки, берем из переменной, либо можно явно прописать
-                to=[subscriber.email],
-            )
+            sub_username = subscriber.username
+            sub_useremail = subscriber.email
 
-            msg.attach_alternative(html_content, "text/html")
+            send_mail_after_creat.delay(sub_username, sub_useremail, html_content, sub_title, sub_text)
 
-            msg.send()
+            # msg = EmailMultiAlternatives(
+            #     # Заголовок письма, тема письма
+            #
+            #     subject=f'Здравствуй, {subscriber.username}. Новая статья в вашем разделе!',
+            #     # Наполнение письма
+            #     body=f'{sub_title}, {sub_text[:50]}',
+            #     # От кого письмо (должно совпадать с реальным адресом почты)
+            #     from_email='bulmiftahoff@yandex.ru',
+            #     # Кому отправлять, конкретные адреса рассылки, берем из переменной, либо можно явно прописать
+            #     to=[subscriber.email],
+            # )
+            #
+            # msg.attach_alternative(html_content, "text/html")
+            #
+            # msg.send()
 
         return redirect('/news/')
 
@@ -136,6 +140,9 @@ class PostEdit(PermissionRequiredMixin, UpdateView):
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
         return Post.objects.get(pk=id)
+
+
+
 
 class CategoryList (ListView):
     model = Category
